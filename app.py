@@ -69,6 +69,7 @@ class UniversalDownloader:
                 'outtmpl': f'{path}/%(title)s.%(ext)s',
                 'merge_output_format': 'mp4',  # Ensures merged output
                 'quiet': False,
+                'cookiefile': os.path.join(os.getcwd(), 'cookies.txt'),
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
