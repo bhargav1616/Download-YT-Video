@@ -1,5 +1,4 @@
-from flask import Flask, request, render_template, jsonify, send_file, session
-import uuid
+from flask import Flask, request, render_template, jsonify, send_file
 import os
 import requests
 import re
@@ -18,14 +17,6 @@ app.config['SECRET_KEY'] = 'b8e5c1fc1e75d3407b64c81eb032d1f432aa87f6eab12da96c7f
 DOWNLOAD_DIR = os.path.join(os.getcwd(), 'downloads')
 if not os.path.exists(DOWNLOAD_DIR):
     os.makedirs(DOWNLOAD_DIR)
-    
-@app.before_request
-def create_user_folder():
-    if 'user_id' not in session:
-        session['user_id'] = str(uuid.uuid4())
-    user_folder = os.path.join(DOWNLOAD_DIR, session['user_id'])
-    if not os.path.exists(user_folder):
-        os.makedirs(user_folder)
 
 class UniversalDownloader:
     def __init__(self):
@@ -294,9 +285,7 @@ class UniversalDownloader:
     
     def download_content(self, url, custom_path=None):
         """Main download function"""
-        user_folder = os.path.join(DOWNLOAD_DIR, session['user_id'])
-        path = custom_path or user_folder
-        # path = custom_path or DOWNLOAD_DIR
+        path = custom_path or DOWNLOAD_DIR
         platform = self.detect_platform(url)
         
         # Create timestamped folder for this download
@@ -345,9 +334,8 @@ def download():
         # Detect platform automatically
         platform = downloader.detect_platform(url)
         
-        # Start download in user-specific folder
-        user_folder = os.path.join(DOWNLOAD_DIR, session['user_id'])
-        result = downloader.download_content(url, custom_path=user_folder)
+        # Start download
+        result = downloader.download_content(url)
         result['platform'] = platform
         
         return jsonify(result)
